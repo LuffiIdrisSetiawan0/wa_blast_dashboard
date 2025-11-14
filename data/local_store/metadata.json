@@ -1,0 +1,268 @@
+[
+  {
+    "id": "27e5dae971ca48b1942504e71775297b",
+    "period_label": "2025-11-14 02:57",
+    "source_filename": "multichannel-transaction-1763023030240.csv",
+    "uploaded_by": "auto-uploader",
+    "uploaded_at": "2025-11-14T02:57:35.171389",
+    "raw_storage_path": "27e5dae971ca48b1942504e71775297b_multichannel-transaction-1763023030240.csv",
+    "clean_storage_path": "27e5dae971ca48b1942504e71775297b_cleaned.parquet",
+    "notes": null,
+    "metrics": {
+      "total_messages": 100,
+      "delivered": 46,
+      "failed": 18,
+      "read": 72,
+      "delivery_rate": 0.46,
+      "read_rate": 0.72,
+      "avg_rate_value": 574.0
+    }
+  },
+  {
+    "id": "c5169f64ebe24e8bb86be5db25039abd",
+    "period_label": "2025-11-14 03:41",
+    "source_filename": "multichannel-transaction-1763023030240.csv",
+    "uploaded_by": "auto-uploader",
+    "uploaded_at": "2025-11-14T03:41:12.382590",
+    "raw_storage_path": "c5169f64ebe24e8bb86be5db25039abd_multichannel-transaction-1763023030240.csv",
+    "clean_storage_path": "c5169f64ebe24e8bb86be5db25039abd_cleaned.parquet",
+    "notes": null,
+    "metrics": {
+      "total_messages": 100,
+      "delivered": 46,
+      "failed": 18,
+      "read": 72,
+      "delivery_rate": 0.46,
+      "read_rate": 0.72,
+      "avg_rate_value": 574.0
+    }
+  },
+  {
+    "id": "b0c42b8a7ff543ada2eac3bd4ba498d7",
+    "period_label": "2025-11-14 03:41",
+    "source_filename": "multichannel-transaction-1763082445610.csv",
+    "uploaded_by": "auto-uploader",
+    "uploaded_at": "2025-11-14T03:41:24.224277",
+    "raw_storage_path": "b0c42b8a7ff543ada2eac3bd4ba498d7_multichannel-transaction-1763082445610.csv",
+    "clean_storage_path": "b0c42b8a7ff543ada2eac3bd4ba498d7_cleaned.parquet",
+    "notes": null,
+    "metrics": {
+      "total_messages": 428,
+      "delivered": 148,
+      "failed": 114,
+      "read": 330,
+      "delivery_rate": 0.34579439252336447,
+      "read_rate": 0.7710280373831776,
+      "avg_rate_value": 497.196261682243
+    }
+  },
+  {
+    "id": "3e8e02f06782412c88df1684bf3999d8",
+    "period_label": "2025-11-14 03:41",
+    "source_filename": "multichannel-transaction-1763082445610.csv",
+    "uploaded_by": "auto-uploader",
+    "uploaded_at": "2025-11-14T03:41:27.005797",
+    "raw_storage_path": "3e8e02f06782412c88df1684bf3999d8_multichannel-transaction-1763082445610.csv",
+    "clean_storage_path": "3e8e02f06782412c88df1684bf3999d8_cleaned.parquet",
+    "notes": null,
+    "metrics": {
+      "total_messages": 428,
+      "delivered": 148,
+      "failed": 114,
+      "read": 330,
+      "delivery_rate": 0.34579439252336447,
+      "read_rate": 0.7710280373831776,
+      "avg_rate_value": 497.196261682243
+    }
+  },
+  {
+    "id": "a8174b275657469996945c823fa4a36d",
+    "period_label": "2025-11-14 03:41",
+    "source_filename": "multichannel-transaction-1763082445610.csv",
+    "uploaded_by": "auto-uploader",
+    "uploaded_at": "2025-11-14T03:41:27.823246",
+    "raw_storage_path": "a8174b275657469996945c823fa4a36d_multichannel-transaction-1763082445610.csv",
+    "clean_storage_path": "a8174b275657469996945c823fa4a36d_cleaned.parquet",
+    "notes": null,
+    "metrics": {
+      "total_messages": 428,
+      "delivered": 148,
+      "failed": 114,
+      "read": 330,
+      "delivery_rate": 0.34579439252336447,
+      "read_rate": 0.7710280373831776,
+      "avg_rate_value": 497.196261682243
+    }
+  },
+  {
+    "id": "64da2e913c484a53a8496f1934382eb9",
+    "period_label": "2025-11-14 03:41",
+    "source_filename": "multichannel-transaction-1763082445610.csv",
+    "uploaded_by": "auto-uploader",
+    "uploaded_at": "2025-11-14T03:41:35.657543",
+    "raw_storage_path": "64da2e913c484a53a8496f1934382eb9_multichannel-transaction-1763082445610.csv",
+    "clean_storage_path": "64da2e913c484a53a8496f1934382eb9_cleaned.parquet",
+    "notes": null,
+    "metrics": {
+      "total_messages": 428,
+      "delivered": 148,
+      "failed": 114,
+      "read": 330,
+      "delivery_rate": 0.34579439252336447,
+      "read_rate": 0.7710280373831776,
+      "avg_rate_value": 497.196261682243
+    }
+  },
+  {
+    "id": "1b77a5e3f7ba4a7cba58a90264ace9c4",
+    "period_label": "2025-11-14 03:41",
+    "source_filename": "multichannel-transaction-1763082445610.csv",
+    "uploaded_by": "auto-uploader",
+    "uploaded_at": "2025-11-14T03:41:55.786069",
+    "raw_storage_path": "1b77a5e3f7ba4a7cba58a90264ace9c4_multichannel-transaction-1763082445610.csv",
+    "clean_storage_path": "1b77a5e3f7ba4a7cba58a90264ace9c4_cleaned.parquet",
+    "notes": null,
+    "metrics": {
+      "total_messages": 428,
+      "delivered": 148,
+      "failed": 114,
+      "read": 330,
+      "delivery_rate": 0.34579439252336447,
+      "read_rate": 0.7710280373831776,
+      "avg_rate_value": 497.196261682243
+    }
+  },
+  {
+    "id": "e23f6aaa28cb496e824dfe9bd4bffdde",
+    "period_label": "2025-11-14 03:42",
+    "source_filename": "multichannel-transaction-1763082445610.csv",
+    "uploaded_by": "auto-uploader",
+    "uploaded_at": "2025-11-14T03:42:17.014990",
+    "raw_storage_path": "e23f6aaa28cb496e824dfe9bd4bffdde_multichannel-transaction-1763082445610.csv",
+    "clean_storage_path": "e23f6aaa28cb496e824dfe9bd4bffdde_cleaned.parquet",
+    "notes": null,
+    "metrics": {
+      "total_messages": 428,
+      "delivered": 148,
+      "failed": 114,
+      "read": 330,
+      "delivery_rate": 0.34579439252336447,
+      "read_rate": 0.7710280373831776,
+      "avg_rate_value": 497.196261682243
+    }
+  },
+  {
+    "id": "d06f67d4754c4300bba021e6378d31ef",
+    "period_label": "2025-11-14 03:43",
+    "source_filename": "multichannel-transaction-1763082445610.csv",
+    "uploaded_by": "auto-uploader",
+    "uploaded_at": "2025-11-14T03:43:25.064910",
+    "raw_storage_path": "d06f67d4754c4300bba021e6378d31ef_multichannel-transaction-1763082445610.csv",
+    "clean_storage_path": "d06f67d4754c4300bba021e6378d31ef_cleaned.parquet",
+    "notes": null,
+    "metrics": {
+      "total_messages": 428,
+      "delivered": 148,
+      "failed": 114,
+      "read": 330,
+      "delivery_rate": 0.34579439252336447,
+      "read_rate": 0.7710280373831776,
+      "avg_rate_value": 497.196261682243
+    }
+  },
+  {
+    "id": "6700d2eefc5f47f7903b0140c9e801ef",
+    "period_label": "2025-11-14 03:46",
+    "source_filename": "multichannel-transaction-1763082445610.csv",
+    "uploaded_by": "auto-uploader",
+    "uploaded_at": "2025-11-14T03:46:38.539985",
+    "raw_storage_path": "6700d2eefc5f47f7903b0140c9e801ef_multichannel-transaction-1763082445610.csv",
+    "clean_storage_path": "6700d2eefc5f47f7903b0140c9e801ef_cleaned.parquet",
+    "notes": null,
+    "metrics": {
+      "total_messages": 428,
+      "delivered": 148,
+      "failed": 114,
+      "read": 165,
+      "delivery_rate": 0.34579439252336447,
+      "read_rate": 0.3855140186915888,
+      "avg_rate_value": 497.196261682243
+    }
+  },
+  {
+    "id": "fb8a4d9cedec469199b618fc10871de4",
+    "period_label": "2025-11-14 03:46",
+    "source_filename": "multichannel-transaction-1763082445610.csv",
+    "uploaded_by": "auto-uploader",
+    "uploaded_at": "2025-11-14T03:46:39.986705",
+    "raw_storage_path": "fb8a4d9cedec469199b618fc10871de4_multichannel-transaction-1763082445610.csv",
+    "clean_storage_path": "fb8a4d9cedec469199b618fc10871de4_cleaned.parquet",
+    "notes": null,
+    "metrics": {
+      "total_messages": 428,
+      "delivered": 148,
+      "failed": 114,
+      "read": 165,
+      "delivery_rate": 0.34579439252336447,
+      "read_rate": 0.3855140186915888,
+      "avg_rate_value": 497.196261682243
+    }
+  },
+  {
+    "id": "ec954016248b4fca8e657adcb6ad6bb8",
+    "period_label": "2025-11-14 04:18",
+    "source_filename": "multichannel-transaction-1763082445610.csv",
+    "uploaded_by": "auto-uploader",
+    "uploaded_at": "2025-11-14T04:18:32.467815",
+    "raw_storage_path": "ec954016248b4fca8e657adcb6ad6bb8_multichannel-transaction-1763082445610.csv",
+    "clean_storage_path": "ec954016248b4fca8e657adcb6ad6bb8_cleaned.parquet",
+    "notes": null,
+    "metrics": {
+      "total_messages": 428,
+      "delivered": 148,
+      "failed": 114,
+      "read": 165,
+      "delivery_rate": 0.34579439252336447,
+      "read_rate": 0.3855140186915888,
+      "avg_rate_value": 497.196261682243
+    }
+  },
+  {
+    "id": "b61f09a8d6e44917b57c033d8a8bc14e",
+    "period_label": "2025-11-14 04:19",
+    "source_filename": "multichannel-transaction-1763082445610.csv",
+    "uploaded_by": "auto-uploader",
+    "uploaded_at": "2025-11-14T04:19:10.235515",
+    "raw_storage_path": "b61f09a8d6e44917b57c033d8a8bc14e_multichannel-transaction-1763082445610.csv",
+    "clean_storage_path": "b61f09a8d6e44917b57c033d8a8bc14e_cleaned.parquet",
+    "notes": null,
+    "metrics": {
+      "total_messages": 428,
+      "delivered": 148,
+      "failed": 114,
+      "read": 165,
+      "delivery_rate": 0.34579439252336447,
+      "read_rate": 0.3855140186915888,
+      "avg_rate_value": 497.196261682243
+    }
+  },
+  {
+    "id": "6c18a53b0237405586ed81814828a012",
+    "period_label": "2025-11-14 06:59",
+    "source_filename": "multichannel-transaction-1763103580257.csv",
+    "uploaded_by": "auto-uploader",
+    "uploaded_at": "2025-11-14T06:59:54.154895",
+    "raw_storage_path": "6c18a53b0237405586ed81814828a012_multichannel-transaction-1763103580257.csv",
+    "clean_storage_path": "6c18a53b0237405586ed81814828a012_cleaned.parquet",
+    "notes": null,
+    "metrics": {
+      "total_messages": 428,
+      "delivered": 147,
+      "failed": 114,
+      "read": 166,
+      "delivery_rate": 0.34345794392523366,
+      "read_rate": 0.3878504672897196,
+      "avg_rate_value": 497.196261682243
+    }
+  }
+]
