@@ -2,10 +2,12 @@ from __future__ import annotations
 
 from io import BytesIO
 from pathlib import Path
-from typing import IO, Dict, Iterable, List, Optional, Tuple
+from typing import IO, Dict, Iterable, List, Optional
 
 import pandas as pd
 
+
+LOCAL_TIMEZONE = "Asia/Jakarta"
 
 DATE_TIME_PAIRS = (
     ("created_date", "created_time", "created_at"),
@@ -30,20 +32,38 @@ REQUIRED_COLUMNS: Iterable[str] = [
 def _normalise_columns(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df.columns = [col.strip().lower().replace(" ", "_") for col in df.columns]
-    df = df.rename(columns={"transaction_id": "transaction_id"})
     return df
+
+
+def _normalise_time_component(series: pd.Series) -> pd.Series:
+    normalized = series.fillna("").astype(str).str.strip()
+    ampm_mask = normalized.str.contains(r"(?i)\b(?:am|pm)\b", na=False)
+    if ampm_mask.any():
+        ampm_values = normalized.loc[ampm_mask]
+        parsed = pd.to_datetime(ampm_values, format="%I:%M:%S %p", errors="coerce")
+        needs_alt = parsed.isna()
+        if needs_alt.any():
+            alt = pd.to_datetime(ampm_values.loc[needs_alt], format="%I:%M %p", errors="coerce")
+            parsed = parsed.fillna(alt)
+        formatted = parsed.dt.strftime("%H:%M:%S")
+        normalized.loc[ampm_mask] = formatted.where(formatted.notna(), ampm_values)
+    normalized = normalized.replace("", "00:00:00")
+    return normalized
 
 
 def _build_datetime(df: pd.DataFrame, date_col: str, time_col: str, target_col: str) -> None:
     if date_col not in df.columns:
         return
-    date_series = df[date_col].fillna("").astype(str)
-    time_series = df[time_col].fillna("00:00:00").astype(str) if time_col in df.columns else "00:00:00"
-    ts = pd.to_datetime(
-        (date_series + " " + time_series).str.strip(),
-        errors="coerce",
-        utc=True,
-    )
+    date_series = df[date_col].fillna("").astype(str).str.strip()
+    if time_col in df.columns:
+        time_series = _normalise_time_component(df[time_col])
+    else:
+        time_series = pd.Series("00:00:00", index=df.index)
+
+    combined = (date_series + " " + time_series).str.strip()
+    ts = pd.to_datetime(combined, format="%Y-%m-%d %H:%M:%S", errors="coerce")
+    if ts.notna().any():
+        ts = ts.dt.tz_localize(LOCAL_TIMEZONE, nonexistent="NaT", ambiguous="NaT")
     df[target_col] = ts
 
 
@@ -92,6 +112,9 @@ def clean_transactions(df: pd.DataFrame) -> pd.DataFrame:
     else:
         df["status"] = ""
 
+    if "category" in df.columns:
+        df["category"] = df["category"].fillna("").str.strip()
+
     df["delivery_status"] = (
         df["delivery_report_status"]
         .where(df["delivery_report_status"].ne(""), df["status"])
@@ -108,10 +131,15 @@ def clean_transactions(df: pd.DataFrame) -> pd.DataFrame:
 
 def compute_kpis(df: pd.DataFrame) -> Dict[str, float]:
     total = len(df)
-    status_series = df.get("delivery_report_status", pd.Series(dtype=str))
-    delivered = int((status_series == "delivered").sum())
+    status_series = df.get("status", pd.Series(dtype=str)).fillna("").str.lower()
+    delivery_series = df.get("delivery_report_status", pd.Series(dtype=str)).fillna("").str.lower()
+    category_series = df.get("category", pd.Series(dtype=str)).fillna("").str.lower()
+
+    marketing_mask = category_series.eq("marketing")
+    delivered = int(((status_series == "succeeded") & marketing_mask).sum())
     failed = int((status_series == "failed").sum())
-    read = int((status_series == "read").sum())
+    read = int(((delivery_series == "read") & marketing_mask).sum())
+    unread = int(((delivery_series.isin(["delivered", "sent"])) & marketing_mask).sum())
     avg_rate = float(df["rate_value"].mean()) if "rate_value" in df.columns and total else 0.0
     total_cost = float(df["rate_value"].sum()) if "rate_value" in df.columns else 0.0
 
@@ -120,6 +148,7 @@ def compute_kpis(df: pd.DataFrame) -> Dict[str, float]:
         "delivered": delivered,
         "failed": failed,
         "read": read,
+        "unread": unread,
         "delivery_rate": delivered / total if total else 0.0,
         "read_rate": read / total if total else 0.0,
         "avg_rate": avg_rate,
@@ -127,135 +156,74 @@ def compute_kpis(df: pd.DataFrame) -> Dict[str, float]:
     }
 
 
-def build_time_series(df: pd.DataFrame) -> pd.DataFrame:
-    if "sent_at" not in df.columns:
-        return pd.DataFrame(columns=["date", "count"])
-    daily = (
-        df.dropna(subset=["sent_at"])
-        .assign(date=lambda data: data["sent_at"].dt.tz_convert("UTC").dt.date)
-        .groupby("date")
-        .size()
-        .reset_index(name="count")
-    )
-    return daily
+def read_vs_unread_by_hour(df: pd.DataFrame) -> pd.DataFrame:
+    block_starts = list(range(0, 24, 3))
+    bucket_counts = pd.Series(0, index=block_starts, dtype="float64")
+
+    if "read_at" in df.columns:
+        category_series = df.get("category", pd.Series(dtype=str)).fillna("").str.lower()
+        read_subset = df.loc[category_series.eq("marketing")].dropna(subset=["read_at"])
+        if not read_subset.empty:
+            read_ts = pd.to_datetime(read_subset["read_at"], errors="coerce")
+            if pd.api.types.is_datetime64tz_dtype(read_ts):
+                read_ts = read_ts.dt.tz_convert(LOCAL_TIMEZONE)
+            else:
+                read_ts = read_ts.dt.tz_localize("UTC").dt.tz_convert(LOCAL_TIMEZONE)
+            hours = read_ts.dt.hour.astype(int)
+            hours = hours.apply(lambda h: h + 12 if 1 <= h <= 6 else h)
+            buckets = (hours // 3) * 3
+            counts = buckets.value_counts().reindex(block_starts, fill_value=0)
+            bucket_counts = bucket_counts.add(counts, fill_value=0)
+
+    result = pd.DataFrame({"block": block_starts})
+    result["read"] = bucket_counts.sort_index().values
+    result["label"] = result["block"].apply(lambda start: f"{start:02d}:00 - {min(start + 3, 24):02d}:00")
+    return result
 
 
 def build_status_breakdown(df: pd.DataFrame) -> pd.DataFrame:
-    column = "delivery_report_status" if "delivery_report_status" in df.columns else "delivery_status"
-    counts = (
-        df[column]
-        .replace("", "unknown")
-        .fillna("unknown")
-        .value_counts()
-        .rename_axis("status")
-        .reset_index(name="count")
-    )
-    return counts
+    if df.empty:
+        return pd.DataFrame(columns=["status", "count"])
 
+    status_series = df.get("status", pd.Series(dtype=str)).fillna("").str.lower()
+    delivery_series = df.get("delivery_report_status", pd.Series(dtype=str)).fillna("").str.lower()
+    category_series = df.get("category", pd.Series(dtype=str)).fillna("").str.lower()
+    marketing_mask = category_series.eq("marketing")
 
-def get_recent_messages(df: pd.DataFrame, limit: int = 20) -> pd.DataFrame:
-    if "sent_at" not in df.columns:
-        return df.head(limit)
-    recent = (
-        df.sort_values("sent_at", ascending=False)
-        .loc[:, ["msisdn", "template_name", "status", "delivery_status", "sent_at"]]
-        .head(limit)
-    )
-    return recent
+    delivered = int(((status_series == "succeeded") & marketing_mask).sum())
+    read = int(((delivery_series == "read") & marketing_mask).sum())
+    unread = int(((delivery_series.isin(["delivered", "sent"])) & marketing_mask).sum())
+    failed = int((status_series == "failed").sum())
 
-
-def template_performance(df: pd.DataFrame, top_n: int = 5) -> pd.DataFrame:
-    if "template_name" not in df.columns:
-        return pd.DataFrame(columns=["template_name", "total", "delivery_rate", "read_rate"])
-    agg = (
-        df.groupby("template_name")
-        .agg(
-            total=("transaction_id", "count"),
-            delivered=("delivery_status", lambda s: (s == "delivered").sum()),
-            read=("delivery_status", lambda s: (s == "read").sum()),
-        )
-        .reset_index()
-    )
-    agg["delivery_rate"] = (agg["delivered"] / agg["total"]).fillna(0)
-    agg["read_rate"] = (agg["read"] / agg["total"]).fillna(0)
-    return agg.sort_values(["total", "delivery_rate"], ascending=[False, False]).head(top_n)
-
-
-def area_performance(df: pd.DataFrame, top_n: int = 5) -> pd.DataFrame:
-    if "area" not in df.columns:
-        return pd.DataFrame(columns=["area", "total", "delivered"])
-    agg = (
-        df.groupby("area")
-        .agg(
-            total=("transaction_id", "count"),
-            delivered=("delivery_status", lambda s: (s == "delivered").sum()),
-        )
-        .reset_index()
-    )
-    agg["delivery_rate"] = (agg["delivered"] / agg["total"]).fillna(0)
-    return agg.sort_values(["total", "delivery_rate"], ascending=[False, False]).head(top_n)
-
-
-def build_hourly_activity(df: pd.DataFrame) -> pd.DataFrame:
-    if "sent_at" not in df.columns:
-        return pd.DataFrame(columns=["hour", "count"])
-    hourly = (
-        df.dropna(subset=["sent_at"])
-        .assign(hour=lambda data: data["sent_at"].dt.tz_convert("UTC").dt.hour)
-        .groupby("hour")
-        .size()
-        .reindex(range(0, 24), fill_value=0)
-        .reset_index()
-        .rename(columns={"index": "hour", 0: "count"})
-    )
-    hourly["label"] = hourly["hour"].apply(lambda h: f"{h:02d}:00")
-    return hourly
+    data = [
+        {"status": "delivered", "count": delivered},
+        {"status": "read", "count": read},
+        {"status": "unread", "count": unread},
+        {"status": "failed", "count": failed},
+    ]
+    return pd.DataFrame(data)
 
 
 def category_breakdown(df: pd.DataFrame) -> pd.DataFrame:
     if "category" not in df.columns:
-        return pd.DataFrame(columns=["category", "total", "rate_sum"])
+        return pd.DataFrame(columns=["category", "total", "delivered", "rate_sum"])
+
+    status_series = df.get("status", pd.Series(dtype=str)).fillna("").str.lower()
+    category_series = df.get("category", pd.Series(dtype=str)).fillna("").str.lower()
+    delivered_flag = ((status_series == "succeeded") & category_series.eq("marketing")).astype(int)
+
+    working_df = df.assign(delivered_flag=delivered_flag)
     agg = (
-        df.groupby("category")
-        .agg(total=("transaction_id", "count"), rate_sum=("rate_value", "sum"))
+        working_df.groupby("category")
+        .agg(
+            total=("transaction_id", "count"),
+            delivered=("delivered_flag", "sum"),
+            rate_sum=("rate_value", "sum"),
+        )
         .reset_index()
         .sort_values("total", ascending=False)
     )
     return agg
-
-
-def read_vs_unread_by_hour(df: pd.DataFrame) -> pd.DataFrame:
-    hours = pd.DataFrame({"hour": range(24)})
-    read_counts = pd.Series(0, index=range(24), dtype="float64")
-    unread_counts = pd.Series(0, index=range(24), dtype="float64")
-
-    if "read_at" in df.columns:
-        read_subset = df.dropna(subset=["read_at"])
-        if not read_subset.empty:
-            read_series = (
-                read_subset.assign(hour=lambda data: data["read_at"].dt.tz_convert("UTC").dt.hour)
-                .groupby("hour")
-                .size()
-            )
-            read_counts = read_counts.add(read_series, fill_value=0)
-
-    if "read_at" in df.columns:
-        unread_subset = df[df["read_at"].isna()]
-        if "sent_at" in df.columns:
-            unread_subset = unread_subset.dropna(subset=["sent_at"])
-            if not unread_subset.empty:
-                unread_series = (
-                    unread_subset.assign(hour=lambda data: data["sent_at"].dt.tz_convert("UTC").dt.hour)
-                    .groupby("hour")
-                    .size()
-                )
-                unread_counts = unread_counts.add(unread_series, fill_value=0)
-
-    result = hours.copy()
-    result["read"] = read_counts.values
-    result["unread"] = unread_counts.values
-    result["label"] = result["hour"].apply(lambda h: f"{h:02d}:00")
-    return result
 
 
 def get_filter_options(df: pd.DataFrame) -> Dict[str, list]:
@@ -283,10 +251,8 @@ def annotate_period_columns(df: pd.DataFrame) -> pd.DataFrame:
     if "sent_at" not in df.columns:
         return df
     result = df.copy()
-    ts = result["sent_at"]
-    if not pd.api.types.is_datetime64_any_dtype(ts):
-        ts = pd.to_datetime(ts, errors="coerce", utc=True)
-    elif pd.api.types.is_datetime64tz_dtype(ts):
+    ts = pd.to_datetime(result["sent_at"], errors="coerce")
+    if pd.api.types.is_datetime64tz_dtype(ts):
         ts = ts.dt.tz_convert("UTC")
     else:
         ts = ts.dt.tz_localize("UTC")

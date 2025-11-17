@@ -264,5 +264,24 @@
       "read_rate": 0.3878504672897196,
       "avg_rate_value": 497.196261682243
     }
+  },
+  {
+    "id": "908d112a4b044b3e8d3bb1ef5e375fc3",
+    "period_label": "2025-11-17 04:25",
+    "source_filename": "multichannel-transaction-1763343618071.csv",
+    "uploaded_by": "auto-uploader",
+    "uploaded_at": "2025-11-17T04:25:29.990103",
+    "raw_storage_path": "908d112a4b044b3e8d3bb1ef5e375fc3_multichannel-transaction-1763343618071.csv",
+    "clean_storage_path": "908d112a4b044b3e8d3bb1ef5e375fc3_cleaned.parquet",
+    "notes": null,
+    "metrics": {
+      "total_messages": 533,
+      "delivered": 391,
+      "failed": 129,
+      "read": 193,
+      "delivery_rate": 0.7335834896810507,
+      "read_rate": 0.3621013133208255,
+      "avg_rate_value": 513.5084427767355
+    }
   }
 ]
